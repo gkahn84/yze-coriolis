@@ -83,6 +83,28 @@ Hooks.on("renderCombatTracker", (app, html, combatInfo) => {
   }
 });
 
+Hooks.on("getChatLogEntryContext", (html, options) => {
+  let canApply = (li) => {
+    //const message = game.messages.get(li.data("messageId"));
+    //return message?.isRoll && message?.isContentVisible && canvas.tokens?.controlled.length;
+    return true;
+  };
+  options.push({
+    name: game.i18n.localize("YZECORIOLIS.ApplyChatContextDamage"),
+    icon: '<i class="fas fa-user-minus"></i>',
+    condition: canApply,
+    callback: (li) => {
+      const message = game.messages.get(li.data("messageId"));
+      const rollData = message.flags.yzecoriolis.results.rollData;
+      canvas.tokens.controlled.map((t) => {
+        const a = t.actor;
+        a.applyDamage(rollData.damage);
+      });
+    },
+  });
+  return options;
+});
+
 function rerenderAllCrew() {
   // re render all characters/npcs to update their crew position drop downs.
   for (let e of game.actors.contents) {

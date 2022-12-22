@@ -187,4 +187,16 @@ export class yzecoriolisActor extends Actor {
     }
     return super.create(initData, options);
   }
+
+  applyDamage(amount = 0) {
+    const currentHp = this.system.hitPoints.value;
+    const minHp = this.system.hitPoints.min;
+    console.log("HP before apply: " + currentHp);
+    if (currentHp - amount <= minHp) {
+      this.system.hitPoints.value = minHp;
+    } else {
+      this.system.hitPoints.value -= amount;
+    }
+    console.log("HP after apply: " + this.system.hitPoints.value);
+  }
 }
