@@ -84,11 +84,21 @@ Hooks.on("renderCombatTracker", (app, html, combatInfo) => {
 });
 
 Hooks.on("getChatLogEntryContext", (html, options) => {
+  // Check if we can apply damage (roll is visible, contains damage and player
+  // has control over at least one selected token)
   let canApply = (li) => {
-    //const message = game.messages.get(li.data("messageId"));
-    //return message?.isRoll && message?.isContentVisible && canvas.tokens?.controlled.length;
-    return true;
+    const message = game.messages.get(li.data("messageId"));
+    const rollData = message.flags.yzecoriolis.results.rollData;
+    return (
+      rollData?.damage &&
+      message?.isContentVisible &&
+      canvas.tokens?.controlled.length
+    );
   };
+
+  // TODO: If target wears armor, allow to ake armor roll first
+
+  // Add context menu if we can apply
   options.push({
     name: game.i18n.localize("YZECORIOLIS.ApplyChatContextDamage"),
     icon: '<i class="fas fa-user-minus"></i>',
