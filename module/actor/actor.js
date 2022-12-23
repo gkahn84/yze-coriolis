@@ -191,12 +191,30 @@ export class yzecoriolisActor extends Actor {
   applyDamage(amount = 0) {
     const currentHp = this.system.hitPoints.value;
     const minHp = this.system.hitPoints.min;
-    console.log("HP before apply: " + currentHp);
+    var newHp = currentHp;
+
     if (currentHp - amount <= minHp) {
-      this.system.hitPoints.value = minHp;
+      newHp = minHp;
     } else {
-      this.system.hitPoints.value -= amount;
+      newHp = currentHp - amount;
     }
-    console.log("HP after apply: " + this.system.hitPoints.value);
+
+    const updates = {
+      "system.hitPoints.value": newHp,
+    };
+
+    // Delegate actual damage application to hook
+    const allowed = Hooks.call(
+      "modifyTokenAttribute",
+      {
+        attribute: "hitPoints.value",
+        value: newHp,
+        isDelta: false,
+        isBar: true,
+      },
+      updates
+    );
+
+    return allowed !== false ? this.update(updates, { dhp: -amount }) : this;
   }
 }
